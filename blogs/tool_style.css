@@ -352,7 +352,7 @@ body::before{
 /* 这是HELPER聊天页面 */
 .helper-page {
   width: 100%;
-  height: 1200px;
+  height: 1100px;
   margin: 0 auto;
 }
 .chat-wrapper {
