@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="TOOLBOX_Lully - 个人工具站与智能体入口" />
+    <title>TOOLBOX_Lully</title>
+    <link rel="stylesheet" href="tool_style.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell" @click="menuOpen = false">
+      <header class="site-header">
+        <a class="brand" href="#" @click.prevent.stop="active_Page = 'menu'; menuOpen = false" aria-label="TOOLBOX_Lully">
+          <span class="brand-mark">
+            <img src="个人认证.svg" alt="" />
+          </span>
+          <span class="brand-copy">
+            <strong>TOOLBOX</strong>
+            <small>Lully Lab</small>
+          </span>
+        </a>
+
+        <div class="command-bar">
+          <label class="search-box" aria-label="搜索">
+            <span>⌘</span>
+            <input v-model.trim="searchText" type="text" placeholder="search toolbox..." />
+          </label>
+
+          <div class="menu-hub" @click.stop>
+            <button
+              type="button"
+              class="menu-trigger"
+              :class="{ active: menuOpen }"
+              :aria-expanded="String(menuOpen)"
+              aria-controls="site-menu"
+              aria-label="打开导航菜单"
+              @click="menuOpen = !menuOpen"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+            <nav id="site-menu" class="nav-dropdown" :class="{ open: menuOpen }" aria-label="主导航">
+              <button
+                v-for="item in navItems"
+                :key="item.key"
+                type="button"
+                class="nav-item"
+                :class="{ active: active_Page === item.key }"
+                @click="active_Page = item.key; menuOpen = false"
+              >
+                <span class="nav-icon"><img :src="item.icon" alt="" /></span>
+                <span>
+                  <strong>{{ item.label }}</strong>
+                  <small>{{ item.desc }}</small>
+                </span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section v-show="active_Page === 'menu'" class="page page-menu">
+          <div class="hero-grid">
+            <div class="hero-panel">
+              <div class="eyebrow">
+                <span class="pulse-dot"></span>
+                ONLINE WORKSPACE
+              </div>
+              <h1>你好，很高兴认识你。</h1>
+              <p class="hero-text">
+                这里是 Lully 的个人工具站：把机械、电路、代码和智能体入口收纳在一个更清爽的极客工作台里。
+              </p>
+
+              <div class="time-board" aria-label="累计陪伴时间">
+                <div class="time-item">
+                  <strong>{{ day }}</strong>
+                  <span>Days</span>
+                </div>
+                <div class="time-item">
+                  <strong>{{ hour }}</strong>
+                  <span>Hours</span>
+                </div>
+                <div class="time-item">
+                  <strong>{{ minute }}</strong>
+                  <span>Minutes</span>
+                </div>
+                <div class="time-item">
+                  <strong>{{ second }}</strong>
+                  <span>Seconds</span>
+                </div>
+              </div>
+            </div>
+
+            <aside class="console-panel" aria-label="站点状态">
+              <div class="console-header">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <div class="console-body">
+                <p><span>$</span> boot toolbox_lully</p>
+                <p><span>></span> theme: night / orange / neon</p>
+                <p><span>></span> modules: tools, ai-helper, notes, links</p>
+                <p><span>></span> status: ready</p>
+              </div>
+            </aside>
+          </div>
+
+          <div class="section-heading">
+            <div>
+              <p>MODULES</p>
+              <h2>快速入口</h2>
+            </div>
+            <span>{{ filteredCards.length }} active nodes</span>
+          </div>
+
+          <div class="feature-grid">
+            <article
+              v-for="card in filteredCards"
+              :key="card.title"
+              class="feature-card"
+              :style="{ backgroundImage: 'linear-gradient(180deg, rgba(10,16,40,.06), rgba(10,16,40,.86)), url(' + card.image + ')' }"
+            >
+              <div class="feature-icon">
+                <img :src="card.icon" alt="" />
+              </div>
+              <div>
+                <p>{{ card.kicker }}</p>
+                <h3>{{ card.title }}</h3>
+                <span>{{ card.desc }}</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section v-show="active_Page === 'project'" class="page page-project">
+          <div class="panel-layout">
+            <aside class="side-panel">
+              <p class="side-label">PART DIRECTORY</p>
+              <button
+                v-for="tab in projectTabs"
+                :key="tab.key"
+                type="button"
+                class="project-tab"
+                :class="{ active: activeTab === tab.key }"
+                @click="activeTab = tab.key"
+              >
+                <span>{{ tab.index }}</span>
+                <strong>{{ tab.title }}</strong>
+              </button>
+            </aside>
+
+            <article class="content-panel">
+              <p class="eyebrow">{{ activeProject.kicker }}</p>
+              <h2>{{ activeProject.title }}</h2>
+              <p class="content-lead">{{ activeProject.lead }}</p>
+
+              <div class="content-list">
+                <div v-for="item in activeProject.points" :key="item" class="content-row">
+                  <span></span>
+                  <p>{{ item }}</p>
+                </div>
+              </div>
+
+              <a v-if="activeProject.link" class="link-chip" :href="activeProject.link" target="_blank" rel="noopener">
+                访问友链
+              </a>
+            </article>
+          </div>
+        </section>
+
+        <section v-show="active_Page === 'blogs'" class="page page-helper">
+          <div class="frame-shell">
+            <div class="frame-info">
+              <p class="eyebrow">AI HELPER</p>
+              <h2>智能体助手</h2>
+              <p>集成百度智能体嵌入页，用于机械、电路、PLC 与工程学习场景的快速咨询。</p>
+            </div>
+            <div class="iframe-card">
+              <iframe src="view.html" title="智能体助手" frameborder="0" scrolling="no" allowfullscreen></iframe>
+            </div>
+          </div>
+        </section>
+
+        <section v-show="active_Page === 'pictures'" class="page page-thanks">
+          <div class="thanks-panel">
+            <img src="月光.jpg" alt="月光背景" />
+            <div>
+              <p class="eyebrow">THANKS</p>
+              <h2>感谢每一位同行者</h2>
+              <p>
+                今日网页的搭建离不开朋友们的帮助。如果你喜欢这个工具站，欢迎为项目点亮 star，也欢迎一起交流学习。
+              </p>
+              <a href="https://jundengweb.pages.dev/" target="_blank" rel="noopener">JUN 的个人博客</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>© 2026 TOOLBOX_Lully</span>
+        <span>All Rights Reserved</span>
+      </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <script>
+      new Vue({
+        el: '#app',
+        data() {
+          return {
+            active_Page: 'menu',
+            activeTab: 'intro',
+            menuOpen: false,
+            searchText: '',
+            setTime: new Date('2026-03-04 00:00:00').getTime(),
+            day: 0,
+            hour: 0,
+            minute: 0,
+            second: 0,
+            timer: null,
+            navItems: [
+              { key: 'menu', label: 'MENU', desc: '首页与模块入口', icon: '菜单.svg' },
+              { key: 'project', label: 'PART', desc: '项目与智能体介绍', icon: '分类.svg' },
+              { key: 'blogs', label: 'HELPER', desc: '嵌入式 AI 助手', icon: '服务.svg' },
+              { key: 'pictures', label: 'THANKS', desc: '友链与致谢', icon: '发现.svg' }
+            ],
+            featureCards: [
+              {
+                kicker: '01 / Utility',
+                title: 'tool',
+                desc: '常用工具与工程入口',
+                image: '工具盒.png',
+                icon: '工具.svg'
+              },
+              {
+                kicker: '02 / Network',
+                title: 'communication',
+                desc: '交流链接与协作资源',
+                image: '交流.png',
+                icon: '个人认证.svg'
+              },
+              {
+                kicker: '03 / Create',
+                title: 'fun',
+                desc: '灵感实验和视觉生成',
+                image: '生成咖啡温馨图片.png',
+                icon: '攻略.svg'
+              },
+              {
+                kicker: '04 / Help',
+                title: 'help',
+                desc: '智能体助手与学习支持',
+                image: '月光.jpg',
+                icon: '服务.svg'
+              }
+            ],
+            projectTabs: [
+              {
+                key: 'intro',
+                index: '00',
+                kicker: 'WELCOME',
+                title: 'Bienvenue!',
+                lead:
+                  '这是 Lully 的第一个网站。它面向机械、电路、代码和智能体创作，把复杂技术整理成更容易使用的个人工作台。',
+                points: [
+                  '持续记录实战经验、学习笔记和可运行的小项目。',
+                  '当前重点是智能体助手和工程学习入口。',
+                  '后续会继续补充工具、博客内容与更多交互模块。'
+                ]
+              },
+              {
+                key: 'mechanical',
+                index: '01',
+                kicker: 'MECHANICAL AGENT',
+                title: '机械结构工程者',
+                lead:
+                  '面向机械结构、有限元分析、SolidWorks 使用等场景的综合智能体，适合从方案构思到结构验证的辅助学习。',
+                points: [
+                  '对初学者友好，可以逐步引导设计思路。',
+                  '参考机械设计、有限元分析和机械原理等知识体系。',
+                  '能够围绕 SolidWorks 问题提供结构化建议。'
+                ]
+              },
+              {
+                key: 'circuit',
+                index: '02',
+                kicker: 'PLC & CIRCUIT AGENT',
+                title: '电路与 PLC 使用者',
+                lead:
+                  '面向电路分析、PLC 设计、S7-1500 与 TIA Portal 学习场景，提供更聚焦的工程建议。',
+                points: [
+                  '熟悉 S7-1500 系列 CPU 与 TIA Portal 基础流程。',
+                  '参考模拟电子技术和电路分析知识体系。',
+                  '适合用于方案排查、学习提纲和问题拆解。'
+                ]
+              },
+              {
+                key: 'links',
+                index: '03',
+                kicker: 'FRIENDS',
+                title: '友链与致谢',
+                lead:
+                  '这个网页的搭建离不开朋友们的帮助。如果你喜欢这个项目，欢迎交流、反馈或为它点亮 star。',
+                points: ['JUN 的个人博客是当前友链入口。', '更多合作链接会在后续版本中继续补充。'],
+                link: 'https://jundengweb.pages.dev/'
+              }
+            ]
+          };
+        },
+        computed: {
+          filteredCards() {
+            const keyword = this.searchText.toLowerCase();
+            if (!keyword) return this.featureCards;
+            return this.featureCards.filter((card) => {
+              return [card.title, card.kicker, card.desc].join(' ').toLowerCase().includes(keyword);
+            });
+          },
+          activeProject() {
+            return this.projectTabs.find((tab) => tab.key === this.activeTab) || this.projectTabs[0];
+          }
+        },
+        methods: {
+          showtime() {
+            const now = new Date().getTime();
+            const difference = Math.max(0, now - this.setTime);
+            const msPerDay = 1000 * 60 * 60 * 24;
+            const msPerHour = 1000 * 60 * 60;
+            const msPerMinute = 1000 * 60;
+
+            this.day = Math.floor(difference / msPerDay);
+            this.hour = Math.floor((difference % msPerDay) / msPerHour);
+            this.minute = Math.floor((difference % msPerHour) / msPerMinute);
+            this.second = Math.floor((difference % msPerMinute) / 1000);
+          }
+        },
+        mounted() {
+          this.showtime();
+          this.timer = setInterval(this.showtime, 1000);
+        },
+        beforeDestroy() {
+          clearInterval(this.timer);
+        }
+      });
+    </script>
+  </body>
+</html>
