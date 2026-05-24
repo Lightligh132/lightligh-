@@ -96,7 +96,7 @@ Vue 中主要状态包括：
 
 ### `blogs/view.html`
 
-智能体嵌入页，通过远程脚本加载百度智能体 EmbedWebSDK，并使用 `appId` 与解码后的 `code` 初始化嵌入式应用。
+智能体嵌入页，通过远程脚本加载百度智能体 EmbedWebSDK。
 
 ### `blogs/tool_style.css`
 
