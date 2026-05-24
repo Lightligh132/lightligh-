@@ -7,6 +7,7 @@
     <meta name="description" content="TOOLBOX_Lully - 个人工具站与智能体入口" />
     <title>TOOLBOX_Lully</title>
     <link rel="stylesheet" href="tool_style.css" />
+    <script src="index.js"></script>
   </head>
   <body>
     <div id="app" class="app-shell" @click="menuOpen = false">
@@ -48,7 +49,7 @@
                 type="button"
                 class="nav-item"
                 :class="{ active: active_Page === item.key }"
-                @click="active_Page = item.key; menuOpen = false"
+                @click="handleNavClick(item)"
               >
                 <span class="nav-icon"><img :src="item.icon" alt="" /></span>
                 <span>
@@ -108,6 +109,20 @@
                 <p><span>></span> status: ready</p>
               </div>
             </aside>
+          </div>
+
+          <div class="announcement-banner">
+            <p class="eyebrow">VISITOR STATS</p>
+            <div class="visitor-stats">
+              <div class="stat-item">
+                <span class="stat-label">历史您已访问</span>
+                <span class="stat-number" id="total-visits">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">今日您已访问</span>
+                <span class="stat-number" id="today-visits">0</span>
+              </div>
+            </div>
           </div>
 
           <div class="section-heading">
@@ -205,6 +220,35 @@
         <span>© 2026 TOOLBOX_Lully</span>
         <span>All Rights Reserved</span>
       </footer>
+
+      <!-- 设置弹窗 -->
+      <div class="settings-overlay" :class="{ show: settingsOpen }" @click.self="settingsOpen = false">
+        <div class="settings-panel">
+          <div class="settings-header">
+            <h3>设置</h3>
+            <button class="settings-close" @click="settingsOpen = false">✕</button>
+          </div>
+          <div class="settings-body">
+            <p class="settings-label">页面背景</p>
+            <div class="theme-buttons">
+              <button
+                class="theme-btn"
+                :class="{ active: theme === 'dark' }"
+                @click="setTheme('dark')"
+              >
+                深色主题
+              </button>
+              <button
+                class="theme-btn"
+                :class="{ active: theme === 'light' }"
+                @click="setTheme('light')"
+              >
+                浅色主题
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
@@ -216,6 +260,8 @@
             active_Page: 'menu',
             activeTab: 'intro',
             menuOpen: false,
+            settingsOpen: false,
+            theme: localStorage.getItem('theme') || 'dark',
             searchText: '',
             setTime: new Date('2026-03-04 00:00:00').getTime(),
             day: 0,
@@ -227,7 +273,8 @@
               { key: 'menu', label: 'MENU', desc: '首页与模块入口', icon: '菜单.svg' },
               { key: 'project', label: 'PART', desc: '项目与智能体介绍', icon: '分类.svg' },
               { key: 'blogs', label: 'HELPER', desc: '嵌入式 AI 助手', icon: '服务.svg' },
-              { key: 'pictures', label: 'THANKS', desc: '友链与致谢', icon: '发现.svg' }
+              { key: 'pictures', label: 'THANKS', desc: '友链与致谢', icon: '发现.svg' },
+              { key: 'settings', label: 'SETTINGS', desc: '页面设置', icon: '工具.svg', isSettings: true }
             ],
             featureCards: [
               {
@@ -336,11 +383,27 @@
             this.hour = Math.floor((difference % msPerDay) / msPerHour);
             this.minute = Math.floor((difference % msPerHour) / msPerMinute);
             this.second = Math.floor((difference % msPerMinute) / 1000);
+          },
+          handleNavClick(item) {
+            if (item.isSettings) {
+              this.settingsOpen = true;
+              this.menuOpen = false;
+            } else {
+              this.active_Page = item.key;
+              this.menuOpen = false;
+            }
+          },
+          setTheme(theme) {
+            this.theme = theme;
+            localStorage.setItem('theme', theme);
+            document.documentElement.setAttribute('data-theme', theme);
           }
         },
         mounted() {
           this.showtime();
           this.timer = setInterval(this.showtime, 1000);
+          visitorCounter.fetchAndCount();
+          document.documentElement.setAttribute('data-theme', this.theme);
         },
         beforeDestroy() {
           clearInterval(this.timer);
