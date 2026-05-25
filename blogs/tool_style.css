@@ -1050,6 +1050,80 @@ main {
   background: rgba(255, 165, 0, 0.12);
 }
 
+.dev-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 200px;
+  padding: 28px 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--panel);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.dev-card:hover {
+  border-color: rgba(255, 165, 0, 0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(255, 165, 0, 0.12);
+}
+
+.dev-avatar {
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(255, 165, 0, 0.5);
+  border-radius: 50%;
+  background: rgba(255, 165, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display-font);
+  font-size: 32px;
+  color: var(--orange);
+  overflow: hidden;
+}
+
+.dev-avatar img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.dev-name {
+  font-family: var(--display-font);
+  font-size: 22px;
+  color: var(--text);
+  margin: 0;
+}
+
+.dev-role {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dev-desc {
+  font-size: 14px;
+  color: var(--text);
+  opacity: 0.8;
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dev-cards-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 18px;
+  margin-top: 28px;
+  overflow-x: auto;
+}
+
 .site-footer {
   display: flex;
   justify-content: space-between;
