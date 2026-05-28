@@ -129,3 +129,7 @@ Vue 中主要状态包括：
 - Nginx 静态目录
 
 部署时将 `blogs` 目录作为站点根目录，或将 `blogs/index.html` 所在目录配置为静态资源目录即可。
+
+## 在线访问
+
+👉 https://github.com/WaterBoat-LL/lightligh-
